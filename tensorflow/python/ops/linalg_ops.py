@@ -191,6 +191,29 @@ def matrix_solve_ls(matrix, rhs, l2_regularizer=0.0, fast=True, name=None):
       matrix, rhs, l2_regularizer, fast=fast, name=name)
 
 
+def pseudo_matrix_inverse(input, name=None):
+  r"""Computes the generalized inverse of one or more square invertible matrices
+  using singular-value decomposition (SVD).
+
+  Args:
+    input: A `Tensor`. Must be one of the following types: `float64`, `float32`.
+      Shape is `[..., M, M]`.
+    name: A name for the operation (optional).
+
+  Returns:
+    A `Tensor`. Has the same type as `input`. Shape is `[..., M, M]`.
+
+    @compatibility(numpy)
+    Equivalent to np.linalg.pinv
+    @end_compatibility
+  """
+  # pylint: disable=protected-access
+  s, u, v = gen_linalg_ops._svd(input, compute_uv=True, full_matrices=False)
+  pseudo_inverse = math_ops.matmul(array_ops.transpose(v), math_ops.matmul(
+    array_ops.diag(math_ops.pow(s, -1)), array_ops.transpose(u)), name=name)
+  return pseudo_inverse
+
+
 def self_adjoint_eig(tensor, name=None):
   """Computes the eigen decomposition of a batch of self-adjoint matrices.
 

@@ -420,7 +420,7 @@ class GmmAlgorithm(object):
           cov = self._covs[c, :, :]
         elif self._covariance_type == DIAG_COVARIANCE:
           cov = array_ops.diag(self._covs[c, :])
-        inverse = linalg_ops.matrix_inverse(cov + self._min_var)
+        inverse = linalg_ops.pseudo_matrix_inverse(cov + self._min_var)
         inv_cov = array_ops.tile(
             array_ops.expand_dims(inverse, 0),
             array_ops.stack([self._num_examples, 1, 1]))

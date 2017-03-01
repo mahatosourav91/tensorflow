@@ -14,3 +14,9 @@ node_modules
 __pycache__
 *.swp
 .vscode/
+.idea/
+/tensorflow/contrib/cmake/build
+/tensorflow/core/util/version_info.cc
+/third_party/gpus/cuda/cuda_config.h
+/third_party/gpus/cuda/include
+
