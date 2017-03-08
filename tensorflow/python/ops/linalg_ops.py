@@ -191,7 +191,7 @@ def matrix_solve_ls(matrix, rhs, l2_regularizer=0.0, fast=True, name=None):
       matrix, rhs, l2_regularizer, fast=fast, name=name)
 
 
-def pseudo_matrix_inverse(input, name=None):
+def pseudo_matrix_inverse(input, rcond=1e-15, name=None):
   r"""Computes the generalized inverse of one or more square invertible matrices
   using singular-value decomposition (SVD).
 
@@ -209,9 +209,14 @@ def pseudo_matrix_inverse(input, name=None):
   """
   # pylint: disable=protected-access
   s, u, v = gen_linalg_ops._svd(input, compute_uv=True, full_matrices=False)
-  pseudo_inverse = math_ops.matmul(array_ops.transpose(v), math_ops.matmul(
-    array_ops.diag(math_ops.pow(s, -1)), array_ops.transpose(u)), name=name)
-  return pseudo_inverse
+  MMAX = np.finfo('float32').max
+  _min = math_ops.multiply(rcond,math_ops.reduce_max(s))
+  _s = array_ops.where(math_ops.greater(s, _min), s,
+                       math_ops.multiply(array_ops.ones_like(s), MMAX))
+  pinv = math_ops.matmul(
+    array_ops.transpose(v), math_ops.matmul(
+      array_ops.diag(math_ops.pow(_s, -1)), array_ops.transpose(u)), name=name)
+  return pinv
 
 
 def self_adjoint_eig(tensor, name=None):
